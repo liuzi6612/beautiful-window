@@ -1,52 +1,57 @@
 <template>
   <main class="pt-10 px-4 text-center">
+    <div class="language-switch mb-4">
+      <el-button class="!mb-4" type="primary" @click="toggleLanguage">
+        {{ currentLanguage === 'en' ? '中文' : 'English' }}
+      </el-button>
+    </div>
     <div class="form mb-4">
       <el-form
         :inline="true"
         :model="formData"
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
       >
-        <el-form-item label="Input text">
+        <el-form-item :label="$t('inputText')">
           <el-input v-model="formData.inputText" />
         </el-form-item>
 
-        <el-form-item label="Border width">
+        <el-form-item :label="$t('borderWidth')">
           <el-input-number v-model="formData.borderSize" :min="0" :max="10" />
         </el-form-item>
 
-        <el-form-item label="Border radius">
+        <el-form-item :label="$t('borderRadius')">
           <el-input-number v-model="formData.borderRadius" :min="0" :max="50" />
         </el-form-item>
 
-        <el-form-item label="Border color">
+        <el-form-item :label="$t('borderColor')">
           <el-color-picker v-model="formData.borderColor" />
         </el-form-item>
 
-        <el-form-item label="Button size">
+        <el-form-item :label="$t('buttonSize')">
           <el-input-number v-model="formData.buttonSize" :min="0" :max="50" />
         </el-form-item>
 
-        <el-form-item label="Left button Color">
+        <el-form-item :label="$t('leftButtonColor')">
           <el-color-picker v-model="formData.leftButtonColor" />
         </el-form-item>
 
-        <el-form-item label="Middle button Color">
+        <el-form-item :label="$t('middleButtonColor')">
           <el-color-picker v-model="formData.middleButtonColor" />
         </el-form-item>
 
-        <el-form-item label="Right button Color">
+        <el-form-item :label="$t('rightButtonColor')">
           <el-color-picker v-model="formData.rightButtonColor" />
         </el-form-item>
 
-        <el-form-item label="Input bg color">
+        <el-form-item :label="$t('inputBgColor')">
           <el-color-picker v-model="formData.inputBackgroundColor" />
         </el-form-item>
 
-        <el-form-item label="Toolbar color">
+        <el-form-item :label="$t('toolbarColor')">
           <el-color-picker v-model="formData.toolbarBackgroundColor" />
         </el-form-item>
 
-        <el-form-item label="Toolbar height">
+        <el-form-item :label="$t('toolbarHeight')">
           <el-input-number
             v-model="formData.toolbarHeight"
             :min="0"
@@ -54,7 +59,7 @@
           />
         </el-form-item>
 
-        <el-form-item label="Image style">
+        <el-form-item :label="$t('imageStyle')">
           <el-select v-model="formData.imageStyle">
             <el-option
               v-for="style in imageStyles"
@@ -65,39 +70,42 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Window width">
-          <el-input-number v-model="formData.windowWidth" :min="400" />
+        <el-form-item :label="$t('windowWidth')">
+          <el-input-number v-model="formData.windowWidth" :min="0" />
         </el-form-item>
 
-        <el-form-item label="Window height">
+        <el-form-item :label="$t('windowHeight')">
           <el-input-number v-model="formData.windowHeight" :min="0" />
-        </el-form-item>
-
-        <el-form-item label="Upload image">
-          <el-button type="primary" class="relative" @click="handleClickFile">
-            Upload
-            <input
-              type="file"
-              accept="image/*"
-              class="w-full h-full hidden"
-              ref="file"
-              @change="onFileChange"
-            />
-          </el-button>
         </el-form-item>
       </el-form>
     </div>
 
-    <el-button class="my-4" type="primary" @click="downloadImg"
-      >Download image</el-button
-    >
+    <el-button class="relative" @click="handleClickFile">
+      {{ $t('uploadImage') }}
+      <input
+        type="file"
+        accept="image/*"
+        class="w-full h-full hidden"
+        ref="file"
+        @change="onFileChange"
+        multiple
+      />
+    </el-button>
 
-    <div class="draw-container text-center flex justify-center items-center">
+    <el-button class="my-4" type="primary" @click="downloadImg">{{
+      $t('downloadImage')
+    }}</el-button>
+
+    <div
+      class="draw-container !mt-2.5 text-center flex justify-center items-center"
+      v-for="item of files"
+      :key="item.name"
+    >
       <div
-        id="main"
-        class="overflow-hidden"
+        class="overflow-hidden draw-picture"
         :style="{
-          width: formData.windowWidth + 'px',
+          width:
+            formData.windowWidth === 0 ? 'auto' : formData.windowWidth + 'px',
           height:
             formData.windowHeight === 0 ? 'auto' : formData.windowHeight + 'px',
           borderWidth: formData.borderSize + 'px',
@@ -112,7 +120,7 @@
             height: formData.toolbarHeight + 'px',
           }"
         >
-          <div class="ml-4 h-full flex items-center gap-2">
+          <div class="!ml-4 h-full flex items-center gap-2">
             <div
               class="rounded-full"
               :style="{
@@ -148,24 +156,20 @@
         </div>
 
         <div class="h-full bg-white pointer-events-none select-none">
-          <img
-            :src="formData.image"
-            @load="init"
-            :style="{ objectFit: formData.imageStyle }"
-          />
+          <img :src="item.url" :style="{ objectFit: formData.imageStyle }" />
         </div>
       </div>
     </div>
 
-    <div class="preview mt-10 max-w-full text-center w-14">
+    <!-- <div class="preview !mt-10 max-w-full text-center w-14">
       <div class="text-left font-bold text-3xl mt-10">
-        <span>Preview</span>
-        <el-button class="ml-4" type="primary" @click="downloadImg"
-          >Download image</el-button
-        >
+        <span>{{ $t('preview') }}</span>
+        <el-button class="!ml-4" type="primary" @click="downloadImg">{{
+          $t('downloadImage')
+        }}</el-button>
       </div>
-      <div id="image-box" class="mt-4 flex justify-center items-center"></div>
-    </div>
+      <div id="image-box" class="!mt-4 flex justify-center items-center"></div>
+    </div> -->
   </main>
 
   <Footer />
@@ -176,10 +180,17 @@ import * as htmlToImage from 'html-to-image'
 import demo from '@/assets/demo.png'
 import Footer from '@/components/Footer.vue'
 import debounce from 'lodash.debounce'
+import { useI18n } from 'vue-i18n'
 
+const { locale } = useI18n()
+const currentLanguage = ref(locale.value)
+const files = reactive([
+  {
+    url: demo,
+    name: 'image.png',
+  },
+])
 const fileRef = useTemplateRef('file')
-const fileName = ref('')
-
 const imageStyles = ['fill', 'contain', 'cover', 'none', 'scale-down']
 
 const formData = reactive({
@@ -197,57 +208,57 @@ const formData = reactive({
   inputBackgroundColor: 'rgb(53,53,53)',
   inputText: 'github.com/xjh22222228/beautiful-window',
   imageStyle: 'cover',
-  image: demo,
 })
 
-const init = debounce(() => {
-  const node = document.getElementById('main')
-
-  htmlToImage
-    .toPng(node, {
-      quality: 1,
-    })
-    .then(function (dataUrl) {
-      const img = new Image()
-      img.src = dataUrl
-      img.id = 'image'
-      img.style.width = formData.windowWidth + 'px'
-      if (formData.windowHeight) {
-        img.style.height = formData.windowHeight + 'px'
-      }
-
-      const imgBox = document.getElementById('image-box')
-      if (imgBox) {
-        imgBox.innerHTML = ''
-        imgBox.appendChild(img)
-      }
-    })
-    .catch(function (error) {
+const init = debounce(async () => {
+  const nodes = Array.from(document.querySelectorAll('.draw-picture'))
+  for (const [index, node] of nodes.entries()) {
+    try {
+      const dataUrl = await htmlToImage.toPng(node, {
+        quality: 1,
+      })
+      files[index].canvas = dataUrl
+    } catch (error) {
       console.error('oops, something went wrong!', error)
-    })
+    }
+  }
 }, 100)
 
 function downloadImg() {
-  const img = document.getElementById('image')
-  if (img) {
-    const a = document.createElement('a')
-    a.download = fileName.value || 'image.png'
-    a.href = img.src
-    a.click()
+  for (const item of files) {
+    if (item.canvas) {
+      const a = document.createElement('a')
+      a.download = item.name || 'image.png'
+      a.href = item.canvas
+      a.click()
+    }
   }
 }
 
 function onFileChange(e) {
-  const { files } = e.target
-  if (files.length <= 0) return
-  const file = files[0]
-  const fileURL = URL.createObjectURL(file)
-  fileName.value = file.name
-  formData.image = fileURL
+  const { files: fileList } = e.target
+  if (fileList.length <= 0) return
+
+  const values = []
+  for (const file of fileList) {
+    values.push({
+      url: URL.createObjectURL(file),
+      name: file.name,
+    })
+  }
+  files.length = 0
+  files.push(...values)
+  e.target.value = null
+  init()
 }
 
 function handleClickFile() {
   fileRef.value.click()
+}
+
+function toggleLanguage() {
+  locale.value = locale.value === 'en' ? 'zh' : 'en'
+  currentLanguage.value = locale.value
 }
 
 watch(formData, () => {
