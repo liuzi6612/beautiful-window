@@ -171,13 +171,14 @@
   <Footer />
 </template>
 <script setup>
-import { onMounted, reactive, watch, useTemplateRef } from 'vue'
+import { onMounted, reactive, watch, useTemplateRef, ref } from 'vue'
 import * as htmlToImage from 'html-to-image'
 import demo from '@/assets/demo.png'
 import Footer from '@/components/Footer.vue'
 import debounce from 'lodash.debounce'
 
 const fileRef = useTemplateRef('file')
+const fileName = ref('')
 
 const imageStyles = ['fill', 'contain', 'cover', 'none', 'scale-down']
 
@@ -230,7 +231,7 @@ function downloadImg() {
   const img = document.getElementById('image')
   if (img) {
     const a = document.createElement('a')
-    a.download = 'image.png'
+    a.download = fileName.value || 'image.png'
     a.href = img.src
     a.click()
   }
@@ -241,6 +242,7 @@ function onFileChange(e) {
   if (files.length <= 0) return
   const file = files[0]
   const fileURL = URL.createObjectURL(file)
+  fileName.value = file.name
   formData.image = fileURL
 }
 
