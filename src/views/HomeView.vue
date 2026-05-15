@@ -206,7 +206,7 @@ const formData = reactive({
   middleButtonColor: 'rgb(230,176,34)',
   rightButtonColor: 'rgb(107,177,75)',
   inputBackgroundColor: 'rgb(53,53,53)',
-  inputText: 'github.com/xjh22222228/beautiful-window',
+  inputText: 'github.com/liuzi6612/beautiful-window',
   imageStyle: 'cover',
 })
 

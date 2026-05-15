@@ -1,10 +1,10 @@
 ## Preview
 
-![](https://gcore.jsdelivr.net/gh/xjh22222228/public@gh-pages/nav/4.png)
+![](https://gcore.jsdelivr.net/gh/liuzi6612/public@gh-pages/nav/4.png)
 
 ## Usage
 
-Open [https://xjh22222228.github.io/beautiful-window](https://xjh22222228.github.io/beautiful-window)
+Open [https://liuzi6612.github.io/beautiful-window](https://liuzi6612.github.io/beautiful-window)
 
 ## LICENSE
 
